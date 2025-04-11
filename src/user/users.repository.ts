@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { PG_CONNECTION } from '../db/db.module';
 import { Pool } from 'pg';
-import { User } from './user.type';
+import { User } from './users.type';
 
 @Injectable()
 export class UsersRepository {
@@ -19,19 +19,22 @@ export class UsersRepository {
       .then((result) => result.rows[0]);
   }
 
-  async create(user: User): Promise<void> {
-    await this.connection.query(
-      'INSERT INTO test.api_user (username, email, password, role, create_time, update_time, version) values ($1, $2, $3, $4, $5, $6, $7)',
-      [
-        user.username,
-        user.email,
-        user.password,
-        user.role,
-        user.create_date,
-        user.update_date,
-        user.version,
-      ],
-    );
+  async create(user: User): Promise<bigint> {
+    return await this.connection
+      .query(
+        'INSERT INTO test.api_user (username, email, password, role, create_time, update_time, version) ' +
+          'values ($1, $2, $3, $4, $5, $6, $7) RETURNING id',
+        [
+          user.username,
+          user.email,
+          user.password,
+          user.role,
+          user.create_date,
+          user.update_date,
+          user.version,
+        ],
+      )
+      .then((result) => result.rows[0]);
   }
 
   async update(id: number, user: User): Promise<void> {
@@ -53,5 +56,17 @@ export class UsersRepository {
     await this.connection.query('DELETE FROM test.api_user WHERE id = $1', [
       id,
     ]);
+  }
+
+  async findByUsername(username: string): Promise<User> {
+    return await this.connection
+      .query('SELECT * FROM test.api_user WHERE username = $1', [username])
+      .then((result) => result.rows[0]);
+  }
+
+  async findByEmail(email: string): Promise<User> {
+    return await this.connection
+      .query('SELECT * FROM test.api_user WHERE email = $1', [email])
+      .then((result) => result.rows[0]);
   }
 }

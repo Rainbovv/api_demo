@@ -5,7 +5,7 @@ import {
   NestInterceptor,
 } from '@nestjs/common';
 import { map, Observable } from 'rxjs';
-import { User, UserDto } from './user.type';
+import { User, UserDto } from './users.type';
 
 const MASKED_PASSWORD: string = '******';
 

@@ -1,5 +1,5 @@
 export interface User {
-  id: bigint;
+  id?: bigint;
   username: string;
   email: string;
   role: number;
@@ -10,7 +10,7 @@ export interface User {
 }
 
 export interface UserDto {
-  id: bigint;
+  id?: bigint;
   username: string;
   email: string;
   role: number;

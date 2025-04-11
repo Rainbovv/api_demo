@@ -5,15 +5,14 @@ import {
   Get,
   Param,
   Patch,
-  Post,
   UseInterceptors,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import {
   UserToDtoBatchTransformInterceptor,
   UserToDtoTransformInterceptor,
-} from './user.interceptor';
-import { User, UserDto } from './user.type';
+} from './users.interceptor';
+import { User, UserDto } from './users.type';
 
 @Controller('users')
 export class UsersController {
@@ -31,10 +30,10 @@ export class UsersController {
     return this.usersService.getById(id);
   }
 
-  @Post()
-  create(@Body() user: UserDto) {
-    return this.usersService.create(user);
-  }
+  // @Post()
+  // create(@Body() user: UserDto) {
+  //   return this.usersService.create(user);
+  // }
 
   @Patch(':id')
   update(@Param('id') id: number, @Body() user: UserDto) {

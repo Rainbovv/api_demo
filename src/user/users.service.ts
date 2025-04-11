@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { UsersRepository } from './users.repository';
-import { User, UserDto, UserNotFoundException } from './user.type';
+import { User, UserDto } from './users.type';
 
 @Injectable()
 export class UsersService {
@@ -12,28 +12,25 @@ export class UsersService {
 
   async getById(id: number): Promise<User> {
     const user = await this.userRepository.findById(id);
-    if (user == undefined) throw new UserNotFoundException(id);
+    if (!user) throw new BadRequestException('User not found');
     return user;
   }
 
-  async create(userDto: UserDto): Promise<void> {
+  async create(userDto: UserDto): Promise<bigint> {
     const date = new Date();
     const user: User = {
-      id: userDto.id,
-      username: userDto.username,
-      email: userDto.email,
-      password: userDto.password,
-      role: userDto.role,
+      ...userDto,
       create_date: date,
       update_date: date,
       version: 1,
+      id: BigInt(0),
     };
-    await this.userRepository.create(user);
+    return this.userRepository.create(user);
   }
 
   async update(id: number, userDto: UserDto): Promise<void> {
     const user = await this.userRepository.findById(id);
-    if (user == undefined) throw new UserNotFoundException(id);
+    if (!user) throw new BadRequestException('User not found');
 
     user.version = ++user.version;
     user.update_date = new Date();
@@ -47,7 +44,15 @@ export class UsersService {
 
   async delete(id: number): Promise<void> {
     const user = await this.userRepository.findById(id);
-    if (user == undefined) throw new UserNotFoundException(id);
+    if (!user) throw new BadRequestException('User not found');
     await this.userRepository.delete(id);
+  }
+
+  async findByUsername(username: string): Promise<User> {
+    return await this.userRepository.findByUsername(username);
+  }
+
+  async findByEmail(email: string) {
+    return await this.userRepository.findByEmail(email);
   }
 }
