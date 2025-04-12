@@ -16,9 +16,3 @@ export interface UserDto {
   role: number;
   password: string;
 }
-
-export class UserNotFoundException extends Error {
-  constructor(id: number) {
-    super('User with id {' + id + '} has not been found');
-  }
-}

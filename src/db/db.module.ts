@@ -1,21 +1,8 @@
 import { Module } from '@nestjs/common';
-import { Pool } from 'pg';
-
-export const DB_CONNECTION = 'DB_CONNECTION';
-const PG_POOL = new Pool({
-  user: 'postgres',
-  host: 'localhost',
-  database: 'api_demo',
-  password: '446571',
-});
-
-const pgDbProvider = {
-  provide: DB_CONNECTION,
-  useValue: PG_POOL,
-};
+import { PG_DB_PROVIDER } from './db.provider';
 
 @Module({
-  providers: [pgDbProvider],
-  exports: [pgDbProvider],
+  providers: [PG_DB_PROVIDER],
+  exports: [PG_DB_PROVIDER],
 })
 export class DbModule {}

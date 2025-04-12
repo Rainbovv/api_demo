@@ -23,14 +23,14 @@ export class UserController {
   @UseInterceptors(UserToDtoBatchTransformInterceptor)
   @RoleDependent(ADMIN)
   getAll(): Promise<User[]> {
-    return this.usersService.getAll();
+    return this.usersService.findAll();
   }
 
   @Get(':id')
   @UseInterceptors(UserToDtoTransformInterceptor)
   @RoleDependent(SELF)
   getById(@Param('id') id: number): Promise<UserDto> {
-    return this.usersService.getById(id);
+    return this.usersService.findById(id);
   }
 
   @Patch(':id')

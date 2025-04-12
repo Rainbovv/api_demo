@@ -1,16 +1,16 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { UserRepository } from './user.repository';
 import { User, UserDto } from './user.type';
+import { UserRepository } from './user.repository';
 
 @Injectable()
 export class UserService {
   constructor(private readonly userRepository: UserRepository) {}
 
-  async getAll(): Promise<User[]> {
+  async findAll(): Promise<User[]> {
     return await this.userRepository.findAll();
   }
 
-  async getById(id: number): Promise<User> {
+  async findById(id: number): Promise<User> {
     const user = await this.userRepository.findById(id);
     if (!user) throw new BadRequestException('User not found');
     return user;
