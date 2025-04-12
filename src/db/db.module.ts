@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { Pool } from 'pg';
 
-export const PG_CONNECTION = 'PG_CONNECTION';
+export const DB_CONNECTION = 'DB_CONNECTION';
 const PG_POOL = new Pool({
   user: 'postgres',
   host: 'localhost',
@@ -10,7 +10,7 @@ const PG_POOL = new Pool({
 });
 
 const pgDbProvider = {
-  provide: PG_CONNECTION,
+  provide: DB_CONNECTION,
   useValue: PG_POOL,
 };
 

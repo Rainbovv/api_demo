@@ -1,10 +1,10 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { UsersRepository } from './users.repository';
-import { User, UserDto } from './users.type';
+import { UserRepository } from './user.repository';
+import { User, UserDto } from './user.type';
 
 @Injectable()
-export class UsersService {
-  constructor(private readonly userRepository: UsersRepository) {}
+export class UserService {
+  constructor(private readonly userRepository: UserRepository) {}
 
   async getAll(): Promise<User[]> {
     return await this.userRepository.findAll();
@@ -52,7 +52,7 @@ export class UsersService {
     return await this.userRepository.findByUsername(username);
   }
 
-  async findByEmail(email: string) {
+  async findByEmail(email: string): Promise<User> {
     return await this.userRepository.findByEmail(email);
   }
 }

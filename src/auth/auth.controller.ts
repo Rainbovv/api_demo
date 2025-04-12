@@ -1,7 +1,7 @@
 import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { Public } from '../app.constants';
 import { AccessToken, LoginRequestDto, RegisterRequestDto } from './auth.type';
+import { Public } from './auth.constant';
 
 @Controller('auth')
 export class AuthController {
@@ -12,7 +12,7 @@ export class AuthController {
   @Post('login')
   async signIn(@Body() loginRequestDto: LoginRequestDto): Promise<AccessToken> {
     const user = await this.authService.validateUser(loginRequestDto);
-    return await this.authService.login(user);
+    return this.authService.login(user);
   }
 
   @Public()
