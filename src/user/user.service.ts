@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { User, UserDto } from './user.type';
+import { Role, User, UserDto } from './user.type';
 import { UserRepository } from './user.repository';
 
 @Injectable()
@@ -28,7 +28,7 @@ export class UserService {
     return this.userRepository.create(user);
   }
 
-  async update(id: number, userDto: UserDto): Promise<void> {
+  async update(id: number, userDto: UserDto): Promise<boolean> {
     const user = await this.userRepository.findById(id);
     if (!user) throw new BadRequestException('User not found');
 
@@ -37,15 +37,14 @@ export class UserService {
     user.username = userDto.username;
     user.email = userDto.email;
     user.password = userDto.password;
-    user.role = userDto.role;
 
-    await this.userRepository.update(id, user);
+    return await this.userRepository.update(id, user);
   }
 
-  async delete(id: number): Promise<void> {
+  async delete(id: number): Promise<boolean> {
     const user = await this.userRepository.findById(id);
     if (!user) throw new BadRequestException('User not found');
-    await this.userRepository.delete(id);
+    return await this.userRepository.delete(id);
   }
 
   async findByUsername(username: string): Promise<User> {
@@ -54,5 +53,9 @@ export class UserService {
 
   async findByEmail(email: string): Promise<User> {
     return await this.userRepository.findByEmail(email);
+  }
+
+  async elevateUser(id: number) {
+    return await this.userRepository.updateUserRole(id, Role.Admin);
   }
 }

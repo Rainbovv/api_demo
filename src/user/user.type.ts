@@ -16,3 +16,8 @@ export interface UserDto {
   role: number;
   password: string;
 }
+
+export enum Role {
+  User = 1,
+  Admin = 2,
+}

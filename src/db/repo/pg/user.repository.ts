@@ -2,9 +2,10 @@ import { Inject, Injectable } from '@nestjs/common';
 import { Pool } from 'pg';
 import { User } from '../../../user/user.type';
 import { PG_CONNECTION } from '../../db.provider';
+import { UserRepository } from '../../../user/user.repository';
 
 @Injectable()
-export class UserPgRepository {
+export class UserPgRepository implements UserRepository {
   constructor(@Inject(PG_CONNECTION) private connection: Pool) {}
 
   async findAll(): Promise<User[]> {
@@ -37,25 +38,26 @@ export class UserPgRepository {
       .then((result) => result.rows[0] as bigint);
   }
 
-  async update(id: number, user: User): Promise<void> {
-    await this.connection.query(
-      'UPDATE test.api_user SET username = $1, email = $2, password = $3, role = $4, update_time = $5, version = $6 WHERE id = $7',
-      [
-        user.username,
-        user.email,
-        user.password,
-        user.role,
-        user.update_date,
-        user.version,
-        id,
-      ],
-    );
+  async update(id: number, user: User): Promise<boolean> {
+    return await this.connection
+      .query(
+        'UPDATE test.api_user SET username = $1, email = $2, password = $3, update_time = $4, version = $5 WHERE id = $6 RETURNING *',
+        [
+          user.username,
+          user.email,
+          user.password,
+          user.update_date,
+          user.version,
+          id,
+        ],
+      )
+      .then((result) => result.rows.length > 0);
   }
 
-  async delete(id: number): Promise<void> {
-    await this.connection.query('DELETE FROM test.api_user WHERE id = $1', [
-      id,
-    ]);
+  async delete(id: number): Promise<boolean> {
+    return await this.connection
+      .query('DELETE FROM test.api_user WHERE id = $1 RETURNING *', [id])
+      .then((result) => result.rows.length > 0);
   }
 
   async findByUsername(username: string): Promise<User> {
@@ -68,5 +70,14 @@ export class UserPgRepository {
     return await this.connection
       .query('SELECT * FROM test.api_user WHERE email = $1', [email])
       .then((result) => result.rows[0] as User);
+  }
+
+  async updateUserRole(id: number, role: number): Promise<boolean> {
+    return await this.connection
+      .query('UPDATE test.api_user SET role = $1 WHERE id = $2 RETURNING *', [
+        role,
+        id,
+      ])
+      .then((result) => result.rows.length > 0);
   }
 }
