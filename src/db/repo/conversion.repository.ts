@@ -12,6 +12,7 @@ export class ConversionRepository implements AbstractConversionRepository {
   constructor(
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private readonly httpService: HttpService,
+    private readonly RATE_URL: string = 'https://www.bnm.md/ro/export-official-exchange-rates?date=',
   ) {}
 
   public async getRate(currencyAbr: CurrencyAbr): Promise<number> {
@@ -28,10 +29,7 @@ export class ConversionRepository implements AbstractConversionRepository {
   private async refreshRateCache(): Promise<void> {
     const data = await firstValueFrom(
       this.httpService
-        .get(
-          'https://www.bnm.md/ro/export-official-exchange-rates?date=' +
-            this.getFormatedDateString(new Date()),
-        )
+        .get(this.RATE_URL + this.getFormatedDateString(new Date()))
         .pipe(map((res) => res.data)),
     )
       .then((s: string) => s.replace(/^([^\n]*\n){3}|(\n[^\n]*){5}$/g, ''))
@@ -45,12 +43,9 @@ export class ConversionRepository implements AbstractConversionRepository {
         ),
       );
 
-    await data.forEach((row: RateRow) => {
-      this.cacheManager.set(
-        row.abr,
-        row.rate.replace(',', '.'),
-        this.getMillisecondsUntilNextDay(),
-      );
+    const ttl = this.getMillisecondsUntilNextDay();
+    await data.forEach(async (row: RateRow) => {
+      await this.cacheManager.set(row.abr, row.rate.replace(',', '.'), ttl);
     });
   }
 
@@ -82,10 +77,11 @@ export class ConversionRepository implements AbstractConversionRepository {
    */
   private getMillisecondsUntilNextDay(): number {
     const now = new Date();
-    const nextDay = new Date(now);
-    nextDay.setDate(now.getDate() + 1); // Move to the next day
-    nextDay.setHours(0, 0, 0, 0); // Set time to midnight
+    const timeNow = now.getTime();
 
-    return nextDay.getTime() - now.getTime();
+    now.setDate(now.getDate() + 1); // Move to the next day
+    now.setHours(0, 0, 0, 0); // Set time to midnight
+
+    return now.getTime() - timeNow;
   }
 }
