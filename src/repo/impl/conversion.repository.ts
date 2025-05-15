@@ -12,8 +12,10 @@ export class ConversionRepository implements AbstractConversionRepository {
   constructor(
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private readonly httpService: HttpService,
-    private readonly RATE_URL: string = 'https://www.bnm.md/ro/export-official-exchange-rates?date=',
   ) {}
+
+  private readonly RATES_URL: string =
+    'https://www.bnm.md/ro/export-official-exchange-rates?date=';
 
   public async getRate(currencyAbr: CurrencyAbr): Promise<number> {
     let rate = await this.cacheManager.get(currencyAbr);
@@ -29,7 +31,7 @@ export class ConversionRepository implements AbstractConversionRepository {
   private async refreshRateCache(): Promise<void> {
     const data = await firstValueFrom(
       this.httpService
-        .get(this.RATE_URL + this.getFormatedDateString(new Date()))
+        .get(this.RATES_URL + this.getFormatedDateString(new Date()))
         .pipe(map((res) => res.data)),
     )
       .then((s: string) => s.replace(/^([^\n]*\n){3}|(\n[^\n]*){5}$/g, ''))
