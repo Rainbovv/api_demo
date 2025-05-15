@@ -1,20 +1,19 @@
 import { Module } from '@nestjs/common';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
-import { DbModule } from '../db/db.module';
+import { RepoModule } from '../repo/repo.module';
 import { UserRepository } from './user.repository';
-import { UserPgRepository } from '../db/repo/pg/user.repository';
+import { UserPgRepository } from '../repo/impl/pg/user.repository';
+
+const USER_REPO_PROVIDER = {
+  provide: UserRepository,
+  useClass: UserPgRepository,
+};
 
 @Module({
-  imports: [DbModule],
+  imports: [RepoModule],
   controllers: [UserController],
-  providers: [
-    UserService,
-    {
-      provide: UserRepository,
-      useClass: UserPgRepository,
-    },
-  ],
+  providers: [UserService, USER_REPO_PROVIDER],
   exports: [UserService],
 })
 export class UserModule {}

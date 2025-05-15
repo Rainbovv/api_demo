@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Pool } from 'pg';
 import { User } from '../../../user/user.type';
-import { PG_CONNECTION } from '../../db.provider';
+import { PG_CONNECTION } from '../../repo.provider';
 import { UserRepository } from '../../../user/user.repository';
 
 @Injectable()
