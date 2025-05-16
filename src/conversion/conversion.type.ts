@@ -2,6 +2,11 @@ export interface ConversionRequest {
   amount: number;
   from: string;
   to: string;
+  date: Date;
+}
+
+export interface ConversionResponse extends ConversionRequest {
+  convertedAmount: number;
 }
 
 export interface RateRow {

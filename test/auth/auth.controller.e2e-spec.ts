@@ -5,7 +5,7 @@ import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { AuthModule } from '../../src/auth/auth.module';
 import { AuthService } from '../../src/auth/auth.service';
-import { ZodFilter } from '../../src/zod/zod.filter';
+import { GlobalFilter } from '../../src/common/filter/global.filter';
 import fn = jest.fn;
 
 describe('AuthController', () => {
@@ -27,7 +27,7 @@ describe('AuthController', () => {
       .useValue(authService)
       .compile();
     app = moduleRef.createNestApplication();
-    app.useGlobalFilters(new ZodFilter());
+    app.useGlobalFilters(new GlobalFilter());
     await app.init();
   });
 

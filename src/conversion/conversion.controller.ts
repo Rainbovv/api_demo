@@ -1,6 +1,10 @@
 import { Body, Controller, Post, UsePipes } from '@nestjs/common';
 import { ConversionService } from './conversion.service';
-import { ConversionRequest, CurrencyAbr } from './conversion.type';
+import {
+  ConversionRequest,
+  ConversionResponse,
+  CurrencyAbr,
+} from './conversion.type';
 import { Public } from '../auth/auth.constant';
 import { ZodPipe } from '../zod/zod.pipe';
 import { ConvertRequestSchema } from '../zod/zod.schema';
@@ -12,11 +16,15 @@ export class ConversionController {
   @Public()
   @UsePipes(new ZodPipe(ConvertRequestSchema))
   @Post()
-  convert(@Body() request: ConversionRequest): Promise<number> {
-    return this.conversionService.convert(
+  async convert(
+    @Body() request: ConversionRequest,
+  ): Promise<ConversionResponse> {
+    const result = await this.conversionService.convert(
       request.amount,
       CurrencyAbr[request.from],
       CurrencyAbr[request.to],
+      request.date,
     );
+    return { ...request, convertedAmount: result };
   }
 }
