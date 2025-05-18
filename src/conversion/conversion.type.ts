@@ -20,3 +20,15 @@ export enum CurrencyAbr {
   USD = 'USD',
   GBP = 'GBP',
 }
+
+export class RateMap {
+  EUR: number;
+  USD: number;
+  GBP: number;
+
+  constructor(rates: RateRow[]) {
+    rates.forEach((row: RateRow) => {
+      this[row.abr] = row.rate.replace(',', '.');
+    });
+  }
+}

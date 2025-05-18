@@ -1,19 +1,19 @@
 import { Module } from '@nestjs/common';
 import { ConversionController } from './conversion.controller';
-import { ConversionRepository } from '../repo/impl/conversion.repository';
 import { HttpModule } from '@nestjs/axios';
-import { AbstractConversionRepository } from './conversion.repository';
 import { ConversionService } from './conversion.service';
-import { CacheModule } from '@nestjs/cache-manager';
+import { CacheModule } from '../cache/cache.module';
+import { CacheService } from '../cache/cache.service';
+import { RedisCacheService } from '../cache/impl/redis.service';
 
-const CONVERSION_REPO_PROVIDER = {
-  provide: AbstractConversionRepository,
-  useClass: ConversionRepository,
+export const CACHE_PROVIDER = {
+  provide: CacheService,
+  useClass: RedisCacheService,
 };
 
 @Module({
-  imports: [HttpModule, CacheModule.register()],
+  imports: [HttpModule, CacheModule],
   controllers: [ConversionController],
-  providers: [ConversionService, CONVERSION_REPO_PROVIDER],
+  providers: [ConversionService, CACHE_PROVIDER],
 })
 export class ConversionModule {}
